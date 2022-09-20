@@ -1,0 +1,31 @@
+@using ApexCharts
+<ApexChart @ref="_chart" TItem="DataPoint<decimal>" Options="@_chartOptions">
+    <ApexPointSeries
+        TItem="DataPoint<decimal>"
+        Items="@DataPoints"
+        SeriesType="SeriesType.Line"
+        XValue="@(_ => _.X)"
+        YValue="@(_ => _.Y)"
+    />
+</ApexChart>
+
+@code {
+    private ApexChart<DataPoint<decimal>> _chart = null!;
+    private ApexChartOptions<DataPoint<decimal>> _chartOptions = new()
+    {
+        Chart = new()
+        {
+            RedrawOnParentResize = false,
+        }
+    };
+
+    private List<DataPoint<decimal>> DataPoints { get; } = new();
+
+    public Task AddPointAsync(object label, decimal? value)
+    {
+        return _chart.AppendDataAsync(new []
+        {
+            new DataPoint<decimal> { X = label, Y = value }
+        });
+    }
+}

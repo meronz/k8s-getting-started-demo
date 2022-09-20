@@ -1,0 +1,61 @@
+{
+    "configurations": [
+        {
+            "name": "Debug BlazorCharts with Kubernetes",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "bridge-to-kubernetes.compound",
+            "program": "${workspaceFolder}/src/BlazorCharts/Server/bin/Debug/net6.0/BlazorCharts.Server.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}",
+            "stopAtEntry": false,
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Development",
+                "ASPNETCORE_URLS": "http://+:8080"
+            },
+            "sourceFileMap": {
+                "/Views": "${workspaceFolder}/Views"
+            }
+        },
+        {
+            "name": "Debug BlazorCharts",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "blazorcharts_build",
+            "program": "${workspaceFolder}/src/BlazorCharts/Server/bin/Debug/net6.0/BlazorCharts.Server.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}",
+            "stopAtEntry": false,
+            "serverReadyAction": {
+                "action": "openExternally",
+                "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
+            },
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Development"
+            },
+            "sourceFileMap": {
+                "/Views": "${workspaceFolder}/Views"
+            }
+        },
+        {
+            "name": "Attach to Kubernetes",
+            "type": "coreclr",
+            "request": "attach",
+            "pipeTransport": {
+                "pipeProgram": "kubectl",
+                "pipeArgs": [
+                    "exec",
+                    "-i",
+                    "${command:extension.vsKubernetesSelectPod}",
+                    "--"
+                ],
+                "pipeCwd": "${workspaceRoot}",
+                "debuggerPath": "/root/vsdbg/vsdbg",
+                "quoteArgs": false
+            },
+            "sourceFileMap": {
+                "/": "${workspaceFolder}"
+            }
+        }
+    ]
+}

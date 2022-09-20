@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sensorsapi
+  labels:
+    app: sensorsapi
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: sensorsapi
+  template:
+    metadata:
+      name: sensorsapi
+      labels:
+        app: sensorsapi
+    spec:
+      containers:
+        - name: sensorsapi
+          image: sensorsapi
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: ConnectionStrings__Redis
+              value: 'redis:6379'
+          resources:
+            requests:
+              memory: 512Mi
+            limits:
+              cpu: 250m
+              memory: 512Mi
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sensorsapi
+spec:
+  selector:
+    app: sensorsapi
+  ports:
+    - port: 8080
+      name: http2

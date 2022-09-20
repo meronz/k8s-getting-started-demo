@@ -1,0 +1,85 @@
+﻿@using Microsoft.AspNetCore.SignalR.Client
+@inject NavigationManager _navigationManager
+
+@page "/sensors"
+
+<PageTitle>Sensors</PageTitle>
+
+<h1>Sensors</h1>
+
+<div>
+    <table class="table table-sm">
+        <thead>
+        <th>@nameof(Sensor.Id)</th>
+        <th>@nameof(Sensor.Name)</th>
+        <th>@nameof(Sensor.Lat)</th>
+        <th>@nameof(Sensor.Lon)</th>
+        <th>@nameof(Sensor.LastSeenOnline)</th>
+        </thead>
+        <tbody>
+        @foreach (var s in _sensors)
+        {
+            <tr>
+                <td>@s.Id</td>
+                <td>@s.Name</td>
+                <td>@s.Lat</td>
+                <td>@s.Lon</td>
+                <td>@s.LastSeenOnline</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+    <nav>
+        <ul class="pagination">
+            <li class="page-item"><a class="page-link" href="" @onclick:preventDefault @onclick="PreviousClick">Previous</a></li>
+            <li class="page-item"><a class="page-link" href="" @onclick:preventDefault @onclick="() => PageClick(1)">1</a></li>
+            <li class="page-item"><a class="page-link" href="" @onclick:preventDefault @onclick="() => PageClick(2)">2</a></li>
+            <li class="page-item"><a class="page-link" href="" @onclick:preventDefault @onclick="() => PageClick(3)">3</a></li>
+            <li class="page-item"><a class="page-link" href="" @onclick:preventDefault @onclick="() => PageClick(4)">4</a></li>
+            <li class="page-item"><a class="page-link" href="" @onclick:preventDefault @onclick="() => PageClick(5)">5</a></li>
+            <li class="page-item"><a class="page-link" href="" @onclick:preventDefault @onclick="NextClick">Next</a></li>
+        </ul>
+    </nav>
+</div>
+
+@code {
+    private HubConnection? _hubConnection;
+    private readonly List<Sensor> _sensors = new();
+    private readonly uint _pageSize = 10;
+    private uint _page = 1;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _hubConnection = new HubConnectionBuilder()
+            .WithUrl(_navigationManager.ToAbsoluteUri("/hubs/sensors"))
+            .Build();
+
+        await _hubConnection.StartAsync();
+        await PageClick(_page);
+    }
+
+    private async Task PageClick(uint page)
+    {
+        _page = page;
+        var start = (_page-1) * _pageSize;
+        var take = _pageSize;
+
+        var sensors = await _hubConnection!.InvokeCoreAsync<Sensor[]>("GetSensors", new object?[]
+        {
+            start,
+            take,
+        });
+        _sensors.Clear();
+        _sensors.AddRange(sensors);
+    }
+
+    private Task PreviousClick()
+    {
+        return PageClick(_page == 1 ? 1 : _page - 1);
+    }
+
+    private Task NextClick()
+    {
+        return PageClick(_page == 5 ? 5 : _page + 1);
+    }
+}

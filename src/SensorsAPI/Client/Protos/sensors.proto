@@ -1,0 +1,27 @@
+syntax = "proto3";
+import "google/protobuf/timestamp.proto";
+option csharp_namespace = "SensorsAPI";
+
+package sensors;
+
+service Sensors {
+  rpc GetSensors (SensorsRequest) returns (SensorsReply);
+}
+
+message SensorsRequest {
+  uint32 start = 1;
+  uint32 take = 2;
+}
+
+message SensorsReply {
+  repeated Sensor sensors = 1;
+  uint32 totalCount = 2;
+}
+
+message Sensor {
+  int32 id = 1;
+  string name=2;
+  string lat=3;
+  string lon=4;
+  google.protobuf.Timestamp lastSeenOnline=5;
+}
