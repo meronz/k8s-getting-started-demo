@@ -28,3 +28,9 @@ deploy:
       - kubernetes/blazorcharts.yaml
       - kubernetes/sensorsapi.yaml
       - kubernetes/ingress.yaml
+
+portForward:
+  - resourceName: blazorcharts
+    resourceType: service
+    port: 8080
+    localPort: 8080
